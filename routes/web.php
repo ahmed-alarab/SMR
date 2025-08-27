@@ -3,23 +3,51 @@
 use App\Http\Controllers\NavController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\RoomController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']); // ✅ must be POST
+//Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+
 Route::get('/signup', [AuthController::class, 'showSignup'])->name('signup');
 Route::post('signup', [AuthController::class, 'signup']);
 
 // Protected routes
 Route::middleware(['custom.auth'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
 
     Route::get('/profile', function () {
         return view('profile');
     })->name('profile');
 });
 
-Route::get('/dashboard', [NavController::class, 'dashboard'])->name('dashboard');
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard')->middleware('auth');
+
+Route::get('/admin/profile', [AdminController::class, 'showProfile'])
+    ->name('admin.profile')
+    ->middleware(['auth', 'role:admin']);
+
+Route::get('/guest/profile', [AdminController::class, 'showProfile'])
+    ->name('guest.profile')
+    ->middleware(['auth', 'role:guest']);
+
+Route::get('/employee/profile', [AdminController::class, 'showProfile'])
+    ->name('employee.profile')
+    ->middleware(['auth', 'role:employee']);
+
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::get('/rooms/create', [RoomController::class, 'create'])->name('rooms.create');
+Route::post('/rooms', [RoomController::class, 'store'])->name('rooms.store');
+Route::get('/rooms/{room}/edit', [RoomController::class, 'edit'])->name('rooms.edit');
+Route::put('/rooms/{room}', [RoomController::class, 'update'])->name('rooms.update');
+Route::delete('/rooms/{room}', [RoomController::class, 'destroy'])->name('rooms.destroy');
+
+

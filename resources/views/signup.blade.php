@@ -2,6 +2,7 @@
     <h2>Smart Meeting Room Signup</h2>
     <form method="POST" action="{{ route('signup') }}">
         @csrf
+
         <div class="form-group">
             <label for="name">Full Name</label>
             <input type="text" id="name" name="name" required>
@@ -20,6 +21,17 @@
         <div class="form-group">
             <label for="password_confirmation">Confirm Password</label>
             <input type="password" id="password_confirmation" name="password_confirmation" required minlength="6">
+        </div>
+
+        <!-- New Role Dropdown -->
+        <div class="form-group">
+            <label for="role">Select Role</label>
+            <select id="role" name="role" required>
+                <option value="" disabled selected>Choose your role</option>
+                <option value="admin">Admin</option>
+                <option value="employee">Employee</option>
+                <option value="guest">Guest</option>
+            </select>
         </div>
 
         <button type="submit" class="signup-btn">Sign Up</button>
@@ -50,7 +62,8 @@
         color: #34495e;
         font-weight: 500;
     }
-    .form-group input {
+    .form-group input,
+    .form-group select {
         width: 100%;
         padding: 8px 10px;
         border: 1px solid #d1d5db;
