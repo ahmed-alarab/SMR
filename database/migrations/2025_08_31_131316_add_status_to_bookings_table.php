@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rooms', function (Blueprint $table) {
-            $table->id();
-            $table->integer('capacity');
-            $table->string('location');
-            $table->boolean('is_booked')->default(false);
-            $table->timestamps();
+        Schema::table('bookings', function (Blueprint $table) {
+            //
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rooms');
+        Schema::table('bookings', function (Blueprint $table) {
+            //
+        });
     }
 };

@@ -50,4 +50,8 @@ Route::get('/rooms/{room}/edit', [RoomController::class, 'edit'])->name('rooms.e
 Route::put('/rooms/{room}', [RoomController::class, 'update'])->name('rooms.update');
 Route::delete('/rooms/{room}', [RoomController::class, 'destroy'])->name('rooms.destroy');
 
+Route::post('/book-room/{room}', [\App\Http\Controllers\BookController::class, 'bookRoom'])->name('employee.bookRoom');
+Route::delete('/cancel-booking/{booking}', [\App\Http\Controllers\BookController::class, 'cancelBooking'])->name('employee.cancelBooking');
+Route::post('/employee/book/{room}', [\App\Http\Controllers\BookController::class, 'bookRoom'])->name('employee.bookRoom');
+
 

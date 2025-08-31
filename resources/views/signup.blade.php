@@ -1,89 +1,127 @@
-<div class="signup-container">
-    <h2>Smart Meeting Room Signup</h2>
-    <form method="POST" action="{{ route('signup') }}">
-        @csrf
+@extends('layouts.app')
 
-        <div class="form-group">
-            <label for="name">Full Name</label>
-            <input type="text" id="name" name="name" required>
+@section('content')
+    <div class="signup-page">
+        <div class="signup-container shadow-sm p-4 rounded">
+            <h2 class="text-primary mb-3">Create Your Account</h2>
+            <p class="text-muted mb-4">Sign up to access the Smart Meeting Room system</p>
+
+            <!-- Display validation errors -->
+            @if($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('signup') }}">
+                @csrf
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required minlength="6" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label for="password_confirmation">Confirm Password</label>
+                    <input type="password" id="password_confirmation" name="password_confirmation" required minlength="6" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Select Role</label>
+                    <select id="role" name="role" required class="form-control">
+                        <option value="" disabled selected>Choose your role</option>
+                        <option value="admin">Admin</option>
+                        <option value="employee">Employee</option>
+                        <option value="guest">Guest</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="signup-btn btn btn-primary w-100">Sign Up</button>
+            </form>
+
+            <p class="mt-3 text-center">
+                Already have an account? <a href="{{ route('login') }}">Log in here</a>.
+            </p>
         </div>
+    </div>
 
-        <div class="form-group">
-            <label for="email">Email Address</label>
-            <input type="email" id="email" name="email" required>
-        </div>
+    <style>
+        .signup-page {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
 
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required minlength="6">
-        </div>
+        .signup-container {
+            background: #fff;
+            max-width: 400px;
+            width: 100%;
+            border-radius: 12px;
+            padding: 32px 24px;
+            text-align: center;
+        }
 
-        <div class="form-group">
-            <label for="password_confirmation">Confirm Password</label>
-            <input type="password" id="password_confirmation" name="password_confirmation" required minlength="6">
-        </div>
+        .signup-container h2 {
+            font-weight: 700;
+        }
 
-        <!-- New Role Dropdown -->
-        <div class="form-group">
-            <label for="role">Select Role</label>
-            <select id="role" name="role" required>
-                <option value="" disabled selected>Choose your role</option>
-                <option value="admin">Admin</option>
-                <option value="employee">Employee</option>
-                <option value="guest">Guest</option>
-            </select>
-        </div>
+        .form-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
 
-        <button type="submit" class="signup-btn">Sign Up</button>
-    </form>
-</div>
+        .form-group label {
+            font-weight: 500;
+            color: #34495e;
+        }
 
-<style>
-    .signup-container {
-        max-width: 400px;
-        margin: 40px auto;
-        padding: 32px 24px;
-        background: #f8f9fa;
-        border-radius: 12px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-        font-family: 'Segoe UI', Arial, sans-serif;
-    }
-    .signup-container h2 {
-        text-align: center;
-        margin-bottom: 24px;
-        color: #2c3e50;
-    }
-    .form-group {
-        margin-bottom: 18px;
-    }
-    .form-group label {
-        display: block;
-        margin-bottom: 6px;
-        color: #34495e;
-        font-weight: 500;
-    }
-    .form-group input,
-    .form-group select {
-        width: 100%;
-        padding: 8px 10px;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-        font-size: 15px;
-        background: #fff;
-    }
-    .signup-btn {
-        width: 100%;
-        padding: 10px 0;
-        background: #2980b9;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.2s;
-    }
-    .signup-btn:hover {
-        background: #1c5d99;
-    }
-</style>
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 15px;
+            background: #fff;
+        }
+
+        .signup-btn {
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .signup-btn:hover {
+            opacity: 0.9;
+        }
+
+        .alert {
+            text-align: left;
+            font-size: 14px;
+        }
+
+        p.mt-3 a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        p.mt-3 a:hover {
+            text-decoration: underline;
+        }
+    </style>
+@endsection
