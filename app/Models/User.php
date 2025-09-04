@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -21,9 +20,12 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role', // ✅ Add this
+        'role',            // User role
+        'dob',             // Date of Birth
+        'phone',           // Phone number
+        'address',         // Address
+        'profile_picture', // Profile picture path
     ];
-
 
     /**
      * The attributes that should be hidden for serialization.
@@ -36,7 +38,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
      * @return array<string, string>
      */
@@ -47,4 +49,24 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Get full URL for profile picture
+     */
+    public function getProfilePictureUrlAttribute(): string
+    {
+        if ($this->profile_picture) {
+            return asset('storage/' . $this->profile_picture);
+        }
+        // Default profile picture if none uploaded
+        return asset('images/default-profile.png');
+    }
+    public function meetings() {
+        return $this->belongsToMany(Meeting::class, 'meeting_attendees');
+    }
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
 }

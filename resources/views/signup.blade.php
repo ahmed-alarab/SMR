@@ -6,7 +6,6 @@
             <h2 class="text-primary mb-3">Create Your Account</h2>
             <p class="text-muted mb-4">Sign up to access the Smart Meeting Room system</p>
 
-            <!-- Display validation errors -->
             @if($errors->any())
                 <div class="alert alert-danger">
                     <ul class="mb-0">
@@ -17,42 +16,65 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('signup') }}">
+            <form method="POST" action="{{ route('signup') }}" enctype="multipart/form-data">
                 @csrf
-                <div class="form-group">
-                    <label for="name">Full Name</label>
-                    <input type="text" id="name" name="name" required class="form-control" />
-                </div>
 
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" required class="form-control" />
-                </div>
+                <div class="row g-3">
+                    <!-- First Row -->
+                    <div class="col-md-4">
+                        <label for="name" class="form-label">Full Name</label>
+                        <input type="text" id="name" name="name" required class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" id="email" name="email" required class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label for="role" class="form-label">Select Role</label>
+                        <select id="role" name="role" required class="form-control">
+                            <option value="" disabled selected>Choose your role</option>
+                            <option value="admin">Admin</option>
+                            <option value="employee">Employee</option>
+                            <option value="guest">Guest</option>
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required minlength="6" class="form-control" />
-                </div>
+                    <!-- Second Row -->
+                    <div class="col-md-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" id="password" name="password" required minlength="6" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="password_confirmation" class="form-label">Confirm Password</label>
+                        <input type="password" id="password_confirmation" name="password_confirmation" required minlength="6" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="dob" class="form-label">Date of Birth</label>
+                        <input type="date" id="dob" name="dob" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="text" id="phone" name="phone" class="form-control" />
+                    </div>
 
-                <div class="form-group">
-                    <label for="password_confirmation">Confirm Password</label>
-                    <input type="password" id="password_confirmation" name="password_confirmation" required minlength="6" class="form-control" />
-                </div>
+                    <!-- Third Row -->
+                    <div class="col-md-8">
+                        <label for="address" class="form-label">Address</label>
+                        <input type="text" id="address" name="address" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label for="profile_picture" class="form-label">Profile Picture</label>
+                        <input type="file" id="profile_picture" name="profile_picture" accept="image/*" class="form-control" />
+                        <small class="form-text text-muted">Optional — JPG, PNG, JPEG</small>
+                    </div>
 
-                <div class="form-group">
-                    <label for="role">Select Role</label>
-                    <select id="role" name="role" required class="form-control">
-                        <option value="" disabled selected>Choose your role</option>
-                        <option value="admin">Admin</option>
-                        <option value="employee">Employee</option>
-                        <option value="guest">Guest</option>
-                    </select>
+                    <div class="col-12 mt-2">
+                        <button type="submit" class="signup-btn btn btn-primary w-100">Sign Up</button>
+                    </div>
                 </div>
-
-                <button type="submit" class="signup-btn btn btn-primary w-100">Sign Up</button>
             </form>
 
-            <p class="mt-3 text-center">
+            <p class="mt-2 text-center">
                 Already have an account? <a href="{{ route('login') }}">Log in here</a>.
             </p>
         </div>
@@ -60,7 +82,7 @@
 
     <style>
         .signup-page {
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -70,10 +92,10 @@
 
         .signup-container {
             background: #fff;
-            max-width: 400px;
-            width: 100%;
+            width: 95%;
+            max-width: 1200px; /* Increased width */
             border-radius: 12px;
-            padding: 32px 24px;
+            padding: 24px 32px;
             text-align: center;
         }
 
@@ -81,47 +103,29 @@
             font-weight: 700;
         }
 
-        .form-group {
-            margin-bottom: 16px;
-            text-align: left;
-        }
-
-        .form-group label {
+        .form-label {
             font-weight: 500;
             color: #34495e;
         }
 
         .form-control {
             width: 100%;
-            padding: 10px 12px;
+            padding: 8px 10px;
             border: 1px solid #d1d5db;
             border-radius: 6px;
-            font-size: 15px;
+            font-size: 14px;
             background: #fff;
         }
 
         .signup-btn {
-            padding: 12px;
+            padding: 10px;
             font-size: 16px;
             font-weight: 600;
-            transition: 0.2s;
-        }
-
-        .signup-btn:hover {
-            opacity: 0.9;
         }
 
         .alert {
             text-align: left;
             font-size: 14px;
-        }
-
-        p.mt-3 a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        p.mt-3 a:hover {
-            text-decoration: underline;
         }
     </style>
 @endsection

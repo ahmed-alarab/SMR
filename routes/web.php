@@ -6,6 +6,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\BookController;
+use App\Http\Controllers\MeetingController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -50,8 +52,18 @@ Route::get('/rooms/{room}/edit', [RoomController::class, 'edit'])->name('rooms.e
 Route::put('/rooms/{room}', [RoomController::class, 'update'])->name('rooms.update');
 Route::delete('/rooms/{room}', [RoomController::class, 'destroy'])->name('rooms.destroy');
 
-Route::post('/book-room/{room}', [\App\Http\Controllers\BookController::class, 'bookRoom'])->name('employee.bookRoom');
-Route::delete('/cancel-booking/{booking}', [\App\Http\Controllers\BookController::class, 'cancelBooking'])->name('employee.cancelBooking');
-Route::post('/employee/book/{room}', [\App\Http\Controllers\BookController::class, 'bookRoom'])->name('employee.bookRoom');
+Route::delete('/cancel-booking/{booking}', [BookController::class, 'cancelBooking'])->name('employee.cancelBooking');
+
+Route::post('/employee/book/{room}', [BookController::class, 'bookRoom'])->name('employee.bookRoom');
+
+Route::put('/admin/update-profile', [AdminController::class, 'updateProfile'])->name('admin.updateProfile');
+Route::put('/employee/update-profile', [AdminController::class, 'updateProfile'])->name('employee.updateProfile');
+Route::put('/employee/bookings/{booking}/reschedule', [BookController::class, 'rescheduleBooking'])->name('employee.rescheduleBooking');
+
+Route::post('/employee/meetings/{booking}', [MeetingController::class, 'store'])
+    ->name('meetings.store');
+
+Route::post('/bookings/{booking}/schedule-meeting', [MeetingController::class, 'store'])->name('employee.scheduleMeeting');
+
 
 

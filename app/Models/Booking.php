@@ -6,11 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Booking extends Model
 {
-    public function bookings()
-    {
-        return $this->hasMany(Booking::class);
-    }
-    protected $fillable = ['user_id', 'room_id', 'status'];
+    protected $fillable = [
+        'user_id',
+        'room_id',
+        'booking_date',
+        'start_time',
+        'end_time',
+        'status',
+    ];
 
     public function room()
     {
@@ -22,5 +25,9 @@ class Booking extends Model
         return $this->belongsTo(User::class);
     }
 
-
+    // Each booking can have multiple meetings
+    public function meetings()
+    {
+        return $this->hasMany(Meeting::class);
+    }
 }
