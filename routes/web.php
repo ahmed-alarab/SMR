@@ -9,9 +9,6 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\MeetingController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']); // ✅ must be POST
 //Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -28,9 +25,9 @@ Route::middleware(['custom.auth'])->group(function () {
     })->name('profile');
 });
 
-Route::get('/dashboard', function () {
+Route::get('/', function () {
     return view('dashboard');
-})->name('dashboard')->middleware('auth');
+})->name('dashboard');
 
 Route::get('/admin/profile', [AdminController::class, 'showProfile'])
     ->name('admin.profile')
@@ -64,6 +61,14 @@ Route::post('/employee/meetings/{booking}', [MeetingController::class, 'store'])
     ->name('meetings.store');
 
 Route::post('/bookings/{booking}/schedule-meeting', [MeetingController::class, 'store'])->name('employee.scheduleMeeting');
+
+Route::post('/meetings/{meeting}/invite-guests', [MeetingController::class, 'inviteGuests'])->name('meetings.inviteGuests');
+
+Route::delete('/meetings/{meeting}', [MeetingController::class, 'deleteMeeting'])
+    ->name('meetings.delete')
+    ->middleware('auth');
+
+
 
 
 

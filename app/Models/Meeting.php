@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Booking;
 use App\Models\MeetingAttendee;
+use App\Models\User;
 
 class Meeting extends Model
 
@@ -22,7 +23,11 @@ class Meeting extends Model
         return $this->belongsTo(Booking::class);
     }
 
-    public function attendees() {
-        return $this->hasMany(MeetingAttendee::class, 'meeting_id');
+    public function attendees()
+    {
+        return $this->belongsToMany(User::class, 'meeting_user', 'meeting_id', 'user_id')
+            ->withTimestamps();
     }
+
+
 }

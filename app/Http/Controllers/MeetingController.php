@@ -15,7 +15,7 @@ class MeetingController extends Controller
      */
     public function create(Booking $booking)
     {
-        $users = User::all(); // All internal users
+        $users = User::all(); // All users for invite
         return view('meetings.create', compact('booking', 'users'));
     }
 
@@ -28,28 +28,25 @@ class MeetingController extends Controller
             'title'        => 'required|string|max:255',
             'agenda'       => 'nullable|string',
             'attendees'    => 'nullable|array',
-            'attendees.*'  => 'email', // We'll store emails instead of IDs
+            'attendees.*'  => 'exists:users,id', // store user IDs
         ]);
 
-        // Create meeting
+        // Create the meeting
         $meeting = Meeting::create([
             'booking_id' => $booking->id,
             'title'      => $request->title,
             'agenda'     => $request->agenda,
         ]);
 
-        // Add attendees if any
+        // Attach attendees if provided
         if (!empty($request->attendees)) {
-            foreach ($request->attendees as $email) {
-                MeetingAttendee::create([
-                    'meeting_id' => $meeting->id,
-                    'user_email' => $email,
-                ]);
-            }
+            // This will attach user IDs to the pivot table 'meeting_attendees'
+            $meeting->attendees()->sync($request->attendees);
         }
 
         return redirect()->back()->with('success', 'Meeting scheduled successfully!');
     }
+
 
     /**
      * Show all meetings for a booking
@@ -58,5 +55,39 @@ class MeetingController extends Controller
     {
         $meetings = $booking->meetings()->with('attendees')->get();
         return view('meetings.index', compact('booking', 'meetings'));
+    }
+
+    /**
+     * Invite additional guests to a meeting
+     */
+    public function inviteGuests(Request $request, $meetingId)
+    {
+        $request->validate([
+            'guests' => 'required|array',
+            'guests.*' => 'exists:users,id'
+        ]);
+
+        $meeting = Meeting::findOrFail($meetingId);
+
+        // Add new guests without removing existing
+        $meeting->attendees()->syncWithoutDetaching($request->guests);
+
+        return redirect()->back()->with('success', 'Guests invited successfully!');
+    }
+
+    /**
+     * Delete a meeting
+     */
+    public function deleteMeeting($meetingId)
+    {
+        $meeting = Meeting::findOrFail($meetingId);
+
+        // Remove all attendees first
+        $meeting->attendees()->detach();
+
+        // Delete the meeting
+        $meeting->delete();
+
+        return redirect()->back()->with('success', 'Meeting deleted successfully!');
     }
 }

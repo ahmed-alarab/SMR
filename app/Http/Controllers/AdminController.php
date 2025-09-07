@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Room;
+use App\Models\Booking;
+use App\Models\Meeting;
 
 class AdminController extends Controller
 {
@@ -17,19 +19,33 @@ class AdminController extends Controller
         // Fetch bookings only for the logged-in user
         $bookings = \App\Models\Booking::where('user_id', $user->id)->get();
 
-        $users = User::where('id', '!=', $user->id)->get(); // all other users to invite
+        // Fetch meetings safely
+        $meetings = Meeting::whereHas('booking', function($query) use ($user) {
+            $query->where('user_id', $user->id); // employee's bookings
+        })->with('attendees', 'booking')->get();
+
+        // Ensure meetings is always a collection
+        if (!$meetings) {
+            $meetings = collect();
+        }
+
+        // Fetch other users (for meeting invites)
+        $users = User::where('id', '!=', $user->id)->get();
 
         // Check the user's role and return the correct profile
         if ($user->role === 'admin') {
             return view('adminProfile', compact('user', 'rooms'));
         } elseif ($user->role === 'employee') {
-            return view('employeeProfile', compact('user', 'rooms', 'bookings', 'users'));
+            return view('employeeProfile', compact('user', 'rooms', 'bookings', 'users', 'meetings'));
         } elseif ($user->role === 'guest') {
             return view('guestProfile', compact('user', 'rooms', 'bookings'));
         }
 
         return redirect('/dashboard')->with('error', 'Unauthorized access.');
     }
+
+
+
 
     public function updateProfile(Request $request)
     {
