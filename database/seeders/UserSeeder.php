@@ -20,15 +20,15 @@ class UserSeeder extends Seeder
 
         User::insert([
             [
-            'name' => 'Admin User',
-            'email' => 'admin@gmail.com',
-            'password' => Hash::make('ahmad1'), // Use Hash facade to hash passwords
-            'role' => 'admin',
-            'phone' => '522354',
-            'address' => 'Admin Address',
-            'dob' => '1990-01-01',
-            'profile_picture' => null,
-        ],
+                'name' => 'Admin User',
+                'email' => 'admin@gmail.com',
+                'password' => Hash::make('ahmad1'), // Use Hash facade to hash passwords
+                'role' => 'admin',
+                'phone' => '522354',
+                'address' => 'Admin Address',
+                'dob' => '1990-01-01',
+                'profile_picture' => null,
+            ],
             [
                 'name' => 'employee User',
                 'email' => 'employee@gmail.com',
