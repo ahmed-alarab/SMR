@@ -9,10 +9,13 @@
             <!-- Header + Logout -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="h2 fw-bold text-primary">Employee Profile</h1>
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn btn-danger px-4">Logout</button>
-                </form>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-info px-4 text-white" data-bs-toggle="modal" data-bs-target="#dashboardModal">View Dashboard</button>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-danger px-4">Logout</button>
+                    </form>
+                </div>
             </div>
 
             <!-- Profile Info -->
@@ -124,7 +127,47 @@
                 </div>
             </div>
 
-            <!-- Available Rooms --> <div class="card shadow-sm border-0 mb-4"> <div class="card-body"> <h4 class="mb-3 text-success">Available Rooms</h4> @if($rooms->isEmpty()) <p class="text-muted">No rooms available at the moment.</p> @else <table class="table table-hover align-middle"> <thead class="table-light"> <tr> <th>Room ID</th> <th>Capacity</th> <th>Location</th> <th>Book</th> </tr> </thead> <tbody> @foreach($rooms as $room) <tr> <td>{{ $room->id }}</td> <td>{{ $room->capacity }}</td> <td>{{ $room->location }}</td> <td> @if($room->bookings->where('status', 'booked')->where('booking_date', now()->toDateString())->isNotEmpty()) <span class="badge bg-secondary">Unavailable Today</span> @else <form action="{{ route('employee.bookRoom', $room->id) }}" method="POST" class="d-flex align-items-center"> @csrf <input type="date" name="booking_date" class="form-control form-control-sm me-2" required> <input type="time" name="start_time" class="form-control form-control-sm me-2" required> <input type="time" name="end_time" class="form-control form-control-sm me-2" required> <button type="submit" class="btn btn-success btn-sm">Book</button> </form> @endif </td> </tr> @endforeach </tbody> </table> @endif </div> </div>
+            <!-- Available Rooms -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h4 class="mb-3 text-success">Available Rooms</h4>
+                    @if($rooms->isEmpty())
+                        <p class="text-muted">No rooms available at the moment.</p>
+                    @else
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Room ID</th>
+                                <th>Capacity</th>
+                                <th>Location</th>
+                                <th>Book</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($rooms as $room)
+                                <tr>
+                                    <td>{{ $room->id }}</td>
+                                    <td>{{ $room->capacity }}</td>
+                                    <td>{{ $room->location }}</td>
+                                    <td> @if($room->bookings->where('status', 'booked')->where('booking_date', now()->toDateString())->isNotEmpty())
+                                            <span class="badge bg-secondary">Unavailable Today</span>
+                                        @else
+                                            <form action="{{ route('employee.bookRoom', $room->id) }}" method="POST" class="d-flex align-items-center">
+                                                @csrf
+                                                <input type="date" name="booking_date" class="form-control form-control-sm me-2" required>
+                                                <input type="time" name="start_time" class="form-control form-control-sm me-2" required>
+                                                <input type="time" name="end_time" class="form-control form-control-sm me-2" required>
+                                                <button type="submit" class="btn btn-success btn-sm">Book</button>
+                                            </form>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    @endif
+                </div>
+            </div>
 
             <!-- My Bookings -->
             <div class="card shadow-sm border-0">
@@ -362,7 +405,6 @@
         </div>
     </div>
 
-    </div>
 
     <!-- Confirmation Modal -->
     <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
@@ -397,6 +439,95 @@
             </div>
         </div>
     </div>
+
+    <!-- Dashboard Modal -->
+
+    <!-- Dashboard Modal -->
+    <div class="modal fade" id="dashboardModal" tabindex="-1" aria-labelledby="dashboardModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="dashboardModalLabel">Employee Dashboard</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-4">
+                        <!-- Card: Total Meetings -->
+                        <div class="col-md-4">
+                            <div class="card shadow-sm p-3 text-center">
+                                <h6 class="text-muted">Total Meetings</h6>
+                                <h2 class="fw-bold text-success">{{ $meetings->count() }}</h2>
+                            </div>
+                        </div>
+
+                        <!-- Card: Invitations -->
+                        <div class="col-md-4">
+                            <div class="card shadow-sm p-3 text-center">
+                                <h6 class="text-muted">Invitations Received</h6>
+                                <h2 class="fw-bold text-primary">{{ $invitations->count() }}</h2>
+                            </div>
+                        </div>
+
+                        <!-- Card: Bookings -->
+                        <div class="col-md-4">
+                            <div class="card shadow-sm p-3 text-center">
+                                <h6 class="text-muted">Rooms Booked</h6>
+                                <h2 class="fw-bold text-warning">{{ $bookings->count() }}</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="row mt-5">
+                        <div class="col-md-6">
+                            <canvas id="meetingsPerMonth"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <canvas id="meetingsStatus"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Meetings per month (example data from backend)
+            var ctx1 = document.getElementById('meetingsPerMonth').getContext('2d');
+            var meetingsPerMonthChart = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: {!! json_encode($meetings->groupBy(fn($m) => \Carbon\Carbon::parse($m->booking->booking_date)->format('F'))->keys()) !!},
+                    datasets: [{
+                        label: 'Meetings',
+                        data: {!! json_encode($meetings->groupBy(fn($m) => \Carbon\Carbon::parse($m->booking->booking_date)->format('F'))->map->count()->values()) !!},
+                        backgroundColor: '#198754'
+                    }]
+                }
+            });
+
+            // Meeting status pie chart
+            var ctx2 = document.getElementById('meetingsStatus').getContext('2d');
+            var meetingsStatusChart = new Chart(ctx2, {
+                type: 'pie',
+                data: {
+                    labels: ['Booked', 'Cancelled'],
+                    datasets: [{
+                        data: [
+                            {{ $bookings->where('status', 'booked')->count() }},
+                            {{ $bookings->where('status', 'cancelled')->count() }}
+                        ],
+                        backgroundColor: ['#0d6efd', '#dc3545']
+                    }]
+                }
+            });
+        });
+    </script>
+
+
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
     <script>
