@@ -119,24 +119,7 @@
                 </div>
             </div>
 
-            <!-- Available Rooms -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body">
-                    <h4 class="mb-3 text-secondary">Available Rooms</h4>
-                    @if($rooms->isEmpty())
-                        <p class="text-muted">No available rooms at the moment.</p>
-                    @else
-                        <ul class="list-group">
-                            @foreach($rooms as $room)
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>{{ $room->name }} (Capacity: {{ $room->capacity }})</span>
-                                    <a href="{{ route('employee.bookRoom', $room->id) }}" class="btn btn-sm btn-success">Book</a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    @endif
-                </div>
-            </div>
+            <!-- Available Rooms --> <div class="card shadow-sm border-0 mb-4"> <div class="card-body"> <h4 class="mb-3 text-success">Available Rooms</h4> @if($rooms->isEmpty()) <p class="text-muted">No rooms available at the moment.</p> @else <table class="table table-hover align-middle"> <thead class="table-light"> <tr> <th>Room ID</th> <th>Capacity</th> <th>Location</th> <th>Book</th> </tr> </thead> <tbody> @foreach($rooms as $room) <tr> <td>{{ $room->id }}</td> <td>{{ $room->capacity }}</td> <td>{{ $room->location }}</td> <td> @if($room->bookings->where('status', 'booked')->where('booking_date', now()->toDateString())->isNotEmpty()) <span class="badge bg-secondary">Unavailable Today</span> @else <form action="{{ route('employee.bookRoom', $room->id) }}" method="POST" class="d-flex align-items-center"> @csrf <input type="date" name="booking_date" class="form-control form-control-sm me-2" required> <input type="time" name="start_time" class="form-control form-control-sm me-2" required> <input type="time" name="end_time" class="form-control form-control-sm me-2" required> <button type="submit" class="btn btn-success btn-sm">Book</button> </form> @endif </td> </tr> @endforeach </tbody> </table> @endif </div> </div>
 
             <!-- My Bookings -->
             <div class="card shadow-sm border-0">
