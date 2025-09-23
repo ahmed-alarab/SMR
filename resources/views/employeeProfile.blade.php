@@ -45,6 +45,75 @@
             </div>
         </div>
 
+        <!-- Edit Profile Modal -->
+        <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{{ route('employee.updateProfile') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            @method('PUT')
+                            <div class="mb-3">
+                                <label>Name</label>
+                                <input type="text" name="name" class="form-control" value="{{ $user->name }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>Email</label>
+                                <input type="email" name="email" class="form-control" value="{{ $user->email }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>Profile Picture</label>
+                                <input type="file" name="profile_picture" class="form-control">
+                            </div>
+                            <div class="text-end">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Meeting Invitations for Employee/Admin -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <h4 class="mb-3 text-secondary">My Meeting Invitations</h4>
+                @if($invitations->isEmpty())
+                    <p class="text-muted">No meeting invitations at the moment.</p>
+                @else
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Meeting ID</th>
+                            <th>Booking ID</th>
+                            <th>Title</th>
+                            <th>Agenda</th>
+                            <th>Date</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($invitations as $meeting)
+                            <tr>
+                                <td>{{ $meeting->id }}</td>
+                                <td>{{ $meeting->booking_id }}</td>
+                                <td>{{ $meeting->title }}</td>
+                                <td>{{ $meeting->agenda ?? 'N/A' }}</td>
+                                <td>{{ \Carbon\Carbon::parse($meeting->booking->booking_date ?? now())->format('d M Y') }}</td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                @endif
+            </div>
+        </div>
+
+
         <!-- Available Rooms -->
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-body">
@@ -112,7 +181,7 @@
                                 <td>{{ $booking->id }}</td>
                                 <td>{{ $booking->room->location }}</td>
                                 <td>{{ \Carbon\Carbon::parse($booking->booking_date)->format('d M Y') }}</td>
-                                <td>{{ \Carbon\Carbon::parse($booking->start_time)->format('h:i A') }} - {{ \Carbon\Carbon::parse($booking->end_time)->format('h:i A') }}</td>
+                                <td>{{ \Carbon\Carbon::parse($booking->start_time)->format('h:i') }} - {{ \Carbon\Carbon::parse($booking->end_time)->format('h:i') }}</td>
                                 <td>
                                     @if($booking->status === 'booked')
                                         <span class="badge bg-success">Booked</span>
@@ -123,111 +192,67 @@
                                 <td>
                                     @if($booking->status === 'booked')
                                         <div class="d-flex gap-1">
-                                            <!-- Cancel Booking -->
                                             <form action="{{ route('employee.cancelBooking', $booking->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
                                             </form>
 
-                                            <!-- Reschedule Booking -->
                                             <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#rescheduleModal{{ $booking->id }}">
                                                 Reschedule
                                             </button>
 
-                                            <!-- Schedule Meeting -->
                                             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#scheduleMeetingModal{{ $booking->id }}">
                                                 Schedule Meeting
                                             </button>
                                         </div>
-
-                                        <!-- Reschedule Modal -->
-                                        <div class="modal fade" id="rescheduleModal{{ $booking->id }}" tabindex="-1">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header bg-warning">
-                                                        <h5 class="modal-title">Reschedule Booking #{{ $booking->id }}</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <form action="{{ route('employee.rescheduleBooking', $booking->id) }}" method="POST">
-                                                            @csrf
-                                                            <div class="mb-3">
-                                                                <label>New Date</label>
-                                                                <input type="date" name="booking_date" class="form-control" required>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label>New Start Time</label>
-                                                                <input type="time" name="start_time" class="form-control" required>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label>New End Time</label>
-                                                                <input type="time" name="end_time" class="form-control" required>
-                                                            </div>
-                                                            <div class="text-end">
-                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                <button type="submit" class="btn btn-warning">Reschedule</button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Schedule Meeting Modal -->
-                                        <div class="modal fade" id="scheduleMeetingModal{{ $booking->id }}" tabindex="-1">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header bg-primary text-white">
-                                                        <h5 class="modal-title">Schedule Meeting for Booking #{{ $booking->id }}</h5>
-                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <form action="{{ route('employee.scheduleMeeting', $booking->id) }}" method="POST">
-                                                            @csrf
-                                                            <div class="mb-3">
-                                                                <label>Meeting Title</label>
-                                                                <input type="text" name="title" class="form-control" required>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label>Agenda</label>
-                                                                <textarea name="agenda" class="form-control" rows="3"></textarea>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label>Invite Guests</label>
-                                                                <select id="guestSelect{{ $booking->id }}" class="form-select mb-2" multiple>
-                                                                    @foreach($users->where('role','guest') as $guest)
-                                                                        <option value="{{ $guest->id }}">{{ $guest->name }} ({{ $guest->email }})</option>
-                                                                    @endforeach
-                                                                </select>
-                                                                <input type="hidden" name="attendees[]" id="attendeesInput{{ $booking->id }}">
-                                                            </div>
-                                                            <div class="text-end">
-                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                <button type="submit" class="btn btn-primary">Create Meeting</button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <script>
-                                            document.addEventListener('DOMContentLoaded', function() {
-                                                let select = document.getElementById('guestSelect{{ $booking->id }}');
-                                                let hiddenInput = document.getElementById('attendeesInput{{ $booking->id }}');
-                                                select.addEventListener('change', function() {
-                                                    let selected = Array.from(select.selectedOptions).map(opt => opt.value);
-                                                    hiddenInput.value = selected.join(',');
-                                                });
-                                            });
-                                        </script>
                                     @else
                                         <span class="text-muted">N/A</span>
                                     @endif
                                 </td>
                             </tr>
                         @endforeach
+                        @foreach($bookings as $booking)
+                            <!-- Reschedule Booking Modal -->
+                            <div class="modal fade" id="rescheduleModal{{ $booking->id }}" tabindex="-1" aria-labelledby="rescheduleModalLabel{{ $booking->id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-warning">
+                                            <h5 class="modal-title" id="rescheduleModalLabel{{ $booking->id }}">Reschedule Booking #{{ $booking->id }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="{{ route('employee.rescheduleBooking', $booking->id) }}" method="POST">
+                                                @csrf
+                                                @method('PUT') <!-- Required for PUT requests -->
+
+                                                <div class="mb-3">
+                                                    <label>New Date</label>
+                                                    <input type="date" name="booking_date" class="form-control" required value="{{ $booking->booking_date }}">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label>New Start Time</label>
+                                                    <input type="time" name="start_time" class="form-control" required value="{{ \Carbon\Carbon::parse($booking->start_time)->format('H:i') }}">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label>New End Time</label>
+                                                    <input type="time" name="end_time" class="form-control" required value="{{ \Carbon\Carbon::parse($booking->end_time)->format('H:i') }}">
+                                                </div>
+
+                                                <div class="text-end">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-warning">Reschedule</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        @endforeach
+
                         </tbody>
                     </table>
                 @endif
@@ -260,7 +285,7 @@
                                 <td>{{ $meeting->title }}</td>
                                 <td>{{ $meeting->agenda ?? 'N/A' }}</td>
                                 <td>
-                                    @if($meeting->attendees && count($meeting->attendees) > 0)
+                                    @if($meeting->attendees && $meeting->attendees->count() > 0)
                                         @foreach($meeting->attendees as $attendee)
                                             <span class="badge bg-info me-1">{{ $attendee->name }}</span>
                                         @endforeach
@@ -270,14 +295,12 @@
                                 </td>
                                 <td>
                                     <div class="d-flex gap-1">
-                                        <!-- Delete Meeting -->
                                         <form action="{{ route('meetings.delete', $meeting->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                         </form>
 
-                                        <!-- Invite More Users Dropdown -->
                                         <div class="dropdown">
                                             <button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                 Invite More
@@ -305,14 +328,18 @@
                                                         @csrf
                                                         <div class="mb-3">
                                                             <label for="userSelect{{ $meeting->id }}" class="form-label">Select Users to Invite</label>
+                                                            @php
+                                                                $attendeeIds = $meeting->attendees ? $meeting->attendees->pluck('id')->toArray() : [];
+                                                            @endphp
                                                             <select class="form-select" id="userSelect{{ $meeting->id }}" name="users[]" multiple size="5">
                                                                 @foreach($users as $potentialUser)
-                                                                    @if($meeting->attendees && !$meeting->attendees->contains('id', $potentialUser->id) && $potentialUser->id != Auth::id())                                                                        <option value="{{ $potentialUser->id }}">{{ $potentialUser->name }} ({{ $potentialUser->email }})</option>
+                                                                    @if(!in_array($potentialUser->id, $attendeeIds) && $potentialUser->id != Auth::id())
+                                                                        <option value="{{ $potentialUser->id }}">{{ $potentialUser->name }} ({{ $potentialUser->email }})</option>
                                                                     @endif
                                                                 @endforeach
                                                             </select>
+                                                            <div class="form-text">Hold Ctrl/Cmd to select multiple users</div>
                                                         </div>
-                                                        <div class="form-text">Hold Ctrl/Cmd to select multiple users</div>
                                                     </form>
                                                 </div>
                                                 <div class="modal-footer">
@@ -322,6 +349,7 @@
                                             </div>
                                         </div>
                                     </div>
+
                                 </td>
                             </tr>
                         @endforeach
@@ -330,9 +358,10 @@
                 @endif
             </div>
         </div>
+
     </div>
 
-    <!-- Confirmation Modal (for inviting users) -->
+    <!-- Confirmation Modal -->
     <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -352,9 +381,7 @@
     </div>
 
     <script>
-        // Function to handle the invitation confirmation
         function confirmInvite(meetingId) {
-            // Get the selected users
             const selectElement = document.getElementById('userSelect' + meetingId);
             const selectedOptions = Array.from(selectElement.selectedOptions);
 
@@ -363,11 +390,9 @@
                 return;
             }
 
-            // Show the confirmation modal
             const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
             confirmationModal.show();
 
-            // Set up the confirm button to submit the form
             document.getElementById('confirmInviteBtn').onclick = function() {
                 document.getElementById('inviteForm' + meetingId).submit();
             };

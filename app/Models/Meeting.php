@@ -17,7 +17,6 @@ class Meeting extends Model
         'booking_id',
         'title',
         'agenda',
-        'attendees', // JSON column
     ];
     public function booking() {
         return $this->belongsTo(Booking::class);

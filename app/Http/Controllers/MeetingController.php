@@ -60,17 +60,13 @@ class MeetingController extends Controller
     /**
      * Invite additional guests to a meeting
      */
-    public function inviteGuests(Request $request, $meetingId)
+    public function invite(Request $request, Meeting $meeting)
     {
         $request->validate([
-            'guests' => 'required|array',
-            'guests.*' => 'exists:users,id'
+            'users' => 'required|array'
         ]);
 
-        $meeting = Meeting::findOrFail($meetingId);
-
-        // Add new guests without removing existing
-        $meeting->attendees()->syncWithoutDetaching($request->guests);
+        $meeting->attendees()->syncWithoutDetaching($request->users);
 
         return redirect()->back()->with('success', 'Guests invited successfully!');
     }
@@ -89,18 +85,5 @@ class MeetingController extends Controller
         $meeting->delete();
 
         return redirect()->back()->with('success', 'Meeting deleted successfully!');
-    }
-
-    public function invite(Request $request, Meeting $meeting)
-    {
-        $request->validate([
-            'users' => 'required|array',
-            'users.*' => 'exists:users,id'
-        ]);
-
-        // Attach new users without detaching existing ones
-        $meeting->attendees()->syncWithoutDetaching($request->users);
-
-        return redirect()->back()->with('success', 'Users invited successfully!');
     }
 }

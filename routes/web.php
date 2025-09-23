@@ -68,7 +68,14 @@ Route::delete('/meetings/{meeting}', [MeetingController::class, 'deleteMeeting']
     ->name('meetings.delete')
     ->middleware('auth');
 
+
 Route::post('/meetings/{meeting}/invite', [MeetingController::class, 'invite'])->name('meetings.invite');
+
+
+Route::put('/guest/update-profile', [AdminController::class, 'updateProfile'])->name('guest.updateProfile');
+
+
+
 
 
 

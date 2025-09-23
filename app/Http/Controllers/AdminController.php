@@ -19,6 +19,7 @@ class AdminController extends Controller
         // Fetch bookings only for the logged-in user
         $bookings = \App\Models\Booking::where('user_id', $user->id)->get();
 
+        $invitations = $user->invitedMeetings()->with('attendees')->get();
         // Fetch meetings safely
         $meetings = Meeting::whereHas('booking', function($query) use ($user) {
             $query->where('user_id', $user->id); // employee's bookings
@@ -31,11 +32,11 @@ class AdminController extends Controller
 
         // Check the user's role and return the correct profile
         if ($user->role === 'admin') {
-            return view('adminProfile', compact('user', 'rooms'));
+            return view('adminProfile', compact('user', 'rooms', 'invitations'));
         } elseif ($user->role === 'employee') {
-            return view('employeeProfile', compact('user', 'rooms', 'bookings', 'users', 'meetings'));
+            return view('employeeProfile', compact('user', 'rooms', 'bookings', 'users', 'meetings', 'invitations'));
         } elseif ($user->role === 'guest') {
-            return view('guestProfile', compact('user', 'rooms', 'bookings'));
+            return view('guestProfile', compact('user', 'rooms', 'bookings', 'invitations'));
         }
 
         return redirect('/dashboard')->with('error', 'Unauthorized access.');

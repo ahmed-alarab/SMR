@@ -69,4 +69,12 @@ class User extends Authenticatable
         return $this->hasMany(Booking::class);
     }
 
+    // Only for guests
+    public function invitedMeetings()
+    {
+        return $this->belongsToMany(Meeting::class, 'meeting_user', 'user_id', 'meeting_id')
+            ->withTimestamps();
+    }
+
+
 }
