@@ -25,9 +25,6 @@ class AdminController extends Controller
         })->with('attendees', 'booking')->get();
 
         // Ensure meetings is always a collection
-        if (!$meetings) {
-            $meetings = collect();
-        }
 
         // Fetch other users (for meeting invites)
         $users = User::where('id', '!=', $user->id)->get();

@@ -93,7 +93,7 @@
             <div class="card-body">
                 <h4 class="mb-3 text-info">My Bookings</h4>
                 @if($bookings->isEmpty())
-                    <p class="text-muted">You haven’t booked any rooms yet.</p>
+                    <p class="text-muted">You haven't booked any rooms yet.</p>
                 @else
                     <table class="table table-hover align-middle">
                         <thead class="table-light">
@@ -260,16 +260,68 @@
                                 <td>{{ $meeting->title }}</td>
                                 <td>{{ $meeting->agenda ?? 'N/A' }}</td>
                                 <td>
-                                    @foreach($meeting->attendees as $attendee)
-                                        <span class="badge bg-info me-1">{{ $attendee->name }}</span>
-                                    @endforeach
+                                    @if($meeting->attendees && count($meeting->attendees) > 0)
+                                        @foreach($meeting->attendees as $attendee)
+                                            <span class="badge bg-info me-1">{{ $attendee->name }}</span>
+                                        @endforeach
+                                    @else
+                                        <span class="text-muted">No attendees</span>
+                                    @endif
                                 </td>
                                 <td>
-                                    <form action="{{ route('employee.deleteMeeting', $meeting->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                    </form>
+                                    <div class="d-flex gap-1">
+                                        <!-- Delete Meeting -->
+                                        <form action="{{ route('meetings.delete', $meeting->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        </form>
+
+                                        <!-- Invite More Users Dropdown -->
+                                        <div class="dropdown">
+                                            <button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Invite More
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#inviteUsersModal{{ $meeting->id }}">
+                                                        Invite More Users
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <!-- Invite Users Modal -->
+                                    <div class="modal fade" id="inviteUsersModal{{ $meeting->id }}" tabindex="-1" aria-labelledby="inviteUsersModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="inviteUsersModalLabel">Invite Users to Meeting #{{ $meeting->id }}</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form id="inviteForm{{ $meeting->id }}" action="{{ route('meetings.invite', $meeting->id) }}" method="POST">
+                                                        @csrf
+                                                        <div class="mb-3">
+                                                            <label for="userSelect{{ $meeting->id }}" class="form-label">Select Users to Invite</label>
+                                                            <select class="form-select" id="userSelect{{ $meeting->id }}" name="users[]" multiple size="5">
+                                                                @foreach($users as $potentialUser)
+                                                                    @if($meeting->attendees && !$meeting->attendees->contains('id', $potentialUser->id) && $potentialUser->id != Auth::id())                                                                        <option value="{{ $potentialUser->id }}">{{ $potentialUser->name }} ({{ $potentialUser->email }})</option>
+                                                                    @endif
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-text">Hold Ctrl/Cmd to select multiple users</div>
+                                                    </form>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="button" class="btn btn-primary" onclick="confirmInvite({{ $meeting->id }})">Send Invitations</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach
@@ -279,4 +331,46 @@
             </div>
         </div>
     </div>
+
+    <!-- Confirmation Modal (for inviting users) -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Invitation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to invite the selected users to this meeting?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmInviteBtn">Yes, Invite Them</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to handle the invitation confirmation
+        function confirmInvite(meetingId) {
+            // Get the selected users
+            const selectElement = document.getElementById('userSelect' + meetingId);
+            const selectedOptions = Array.from(selectElement.selectedOptions);
+
+            if (selectedOptions.length === 0) {
+                alert('Please select at least one user to invite.');
+                return;
+            }
+
+            // Show the confirmation modal
+            const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+            confirmationModal.show();
+
+            // Set up the confirm button to submit the form
+            document.getElementById('confirmInviteBtn').onclick = function() {
+                document.getElementById('inviteForm' + meetingId).submit();
+            };
+        }
+    </script>
 @endsection

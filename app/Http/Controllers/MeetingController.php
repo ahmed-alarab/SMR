@@ -90,4 +90,17 @@ class MeetingController extends Controller
 
         return redirect()->back()->with('success', 'Meeting deleted successfully!');
     }
+
+    public function invite(Request $request, Meeting $meeting)
+    {
+        $request->validate([
+            'users' => 'required|array',
+            'users.*' => 'exists:users,id'
+        ]);
+
+        // Attach new users without detaching existing ones
+        $meeting->attendees()->syncWithoutDetaching($request->users);
+
+        return redirect()->back()->with('success', 'Users invited successfully!');
+    }
 }
