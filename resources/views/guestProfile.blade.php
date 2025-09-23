@@ -6,7 +6,6 @@
     <div class="container my-5">
         <div class="card shadow-lg rounded-4 p-4">
 
-            <!-- Header + Logout -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="h2 fw-bold text-primary">Guest Profile</h1>
                 <form action="{{ route('logout') }}" method="POST">
@@ -15,7 +14,6 @@
                 </form>
             </div>
 
-            <!-- Profile Info -->
             <div class="d-flex align-items-center gap-4 mb-5 flex-wrap">
                 <div>
                     <img src="{{ $user->profile_picture ? asset('storage/' . $user->profile_picture) : asset('images/default-profile.png') }}"
@@ -47,7 +45,6 @@
                 </div>
             </div>
 
-            <!-- Edit Profile Modal -->
             <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -89,10 +86,15 @@
                 </div>
             </div>
 
-            <!-- Invitations -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="mb-0 text-secondary">Invitations</h4>
+                <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#calendarModal">
+                    View Calendar
+                </button>
+            </div>
+
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body">
-                    <h4 class="mb-3 text-secondary">Invitations</h4>
                     @if($invitations->isEmpty())
                         <p class="text-muted">You haven't been invited to any meetings yet.</p>
                     @else
@@ -122,6 +124,20 @@
                 </div>
             </div>
 
+            <div class="modal fade" id="calendarModal" tabindex="-1" aria-labelledby="calendarModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="calendarModalLabel">Meeting Calendar</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id='calendar'></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -144,5 +160,46 @@
                 gap: 1rem !important;
             }
         }
+        .fc-event {
+            background-color: #0d6efd !important;
+            border-color: #0d6efd !important;
+            color: #fff !important;
+        }
     </style>
+
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: [
+                        @foreach($invitations as $meeting)
+                    {
+                        title: '{{ $meeting->title }}',
+                        start: '{{ $meeting->booking->booking_date ?? now() }}T{{ $meeting->booking->start_time ?? '00:00:00' }}',
+                        end: '{{ $meeting->booking->booking_date ?? now() }}T{{ $meeting->booking->end_time ?? '00:00:00' }}',
+                        url: '#'
+                    },
+                    @endforeach
+                ],
+                eventClick: function(info) {
+                    info.jsEvent.preventDefault();
+                    alert('Meeting: ' + info.event.title + '\nStarts: ' + info.event.start.toLocaleString() + '\nEnds: ' + info.event.end.toLocaleString());
+                }
+            });
+
+            var calendarModal = document.getElementById('calendarModal');
+            calendarModal.addEventListener('shown.bs.modal', function () {
+                calendar.render();
+            });
+        });
+    </script>
 @endsection

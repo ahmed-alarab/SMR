@@ -89,7 +89,12 @@
             <!-- Meeting Invitations -->
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body">
-                    <h4 class="mb-3 text-secondary">Meeting Invitations</h4>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="mb-0 text-secondary">Invitations</h4>
+                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#calendarModal">
+                            View Calendar
+                        </button>
+                    </div>
                     @if($invitations->isEmpty())
                         <p class="text-muted">You haven't been invited to any meetings yet.</p>
                     @else
@@ -377,6 +382,56 @@
             </div>
         </div>
     </div>
+
+    <!-- Calendar Modal -->
+    <div class="modal fade" id="calendarModal" tabindex="-1" aria-labelledby="calendarModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="calendarModalLabel">Meeting Calendar</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id='calendar'></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: [
+                        @foreach($invitations as $meeting)
+                    {
+                        title: '{{ $meeting->title }}',
+                        start: '{{ $meeting->booking->booking_date ?? now() }}T{{ $meeting->booking->start_time ?? '00:00:00' }}',
+                        end: '{{ $meeting->booking->booking_date ?? now() }}T{{ $meeting->booking->end_time ?? '00:00:00' }}',
+                        url: '#'
+                    },
+                    @endforeach
+                ],
+                eventClick: function(info) {
+                    info.jsEvent.preventDefault();
+                    alert('Meeting: ' + info.event.title + '\nStarts: ' + info.event.start.toLocaleString() + '\nEnds: ' + info.event.end.toLocaleString());
+                }
+            });
+
+            var calendarModal = document.getElementById('calendarModal');
+            calendarModal.addEventListener('shown.bs.modal', function () {
+                calendar.render();
+            });
+        });
+    </script>
 
     <script>
         function confirmInvite(meetingId) {
