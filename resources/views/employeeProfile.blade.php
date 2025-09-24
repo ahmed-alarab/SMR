@@ -18,76 +18,7 @@
                 </div>
             </div>
 
-            <!-- Profile Info -->
-            <div class="d-flex align-items-center gap-4 mb-5 flex-wrap">
-                <div>
-                    <img src="{{ $user->profile_picture ? asset('storage/' . $user->profile_picture) : asset('images/default-profile.png') }}"
-                         alt="Profile Picture"
-                         class="rounded-circle border border-primary shadow"
-                         style="width: 120px; height: 120px; object-fit: cover;">
-                </div>
-                <div class="ms-2">
-                    <div class="mb-2">
-                        <small class="text-muted">Full Name</small>
-                        <div class="fs-5 fw-semibold">{{ $user->name }}</div>
-                    </div>
-                    <div class="mb-2">
-                        <small class="text-muted">Email</small>
-                        <div class="fs-5 fw-semibold">{{ $user->email }}</div>
-                    </div>
-                    <div class="mb-2">
-                        <small class="text-muted">Phone</small>
-                        <div class="fs-5 fw-semibold">{{ $user->phone ?? 'Not provided' }}</div>
-                    </div>
-                    <div>
-                        <small class="text-muted">Address</small>
-                        <div class="fs-5 fw-semibold">{{ $user->address ?? 'Not provided' }}</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Edit Profile Button -->
-            <div class="text-end mb-5">
-                <button class="btn btn-primary px-4" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</button>
-            </div>
-
-            <!-- Edit Profile Modal -->
-            <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header bg-primary text-white">
-                            <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <form action="{{ route('employee.updateProfile') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            @method('PUT')
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label class="form-label">Full Name</label>
-                                    <input type="text" name="name" class="form-control" value="{{ $user->name }}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Phone</label>
-                                    <input type="text" name="phone" class="form-control" value="{{ $user->phone }}">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Address</label>
-                                    <input type="text" name="address" class="form-control" value="{{ $user->address }}">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Profile Picture</label>
-                                    <input type="file" name="profile_picture" class="form-control">
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Save Changes</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+            <!-- Employee Info --> <div class="card shadow-sm border-0 mb-4"> <div class="card-body d-flex align-items-center"> <div class="me-4"> <img src="{{ $user->profile_picture ? asset('storage/' . $user->profile_picture) : asset('images/default-profile.png') }}" alt="Profile Picture" class="rounded-circle" width="120" height="120" style="object-fit: cover; border: 2px solid #007bff;"> </div> <div class="flex-grow-1"> <h4 class="mb-3 text-primary">My Information</h4> <p><strong>Name:</strong> {{ $user->name }}</p> <p><strong>Email:</strong> {{ $user->email }}</p> <p><strong>Role:</strong> {{ ucfirst($user->role) }}</p> @if($user->dob) <p><strong>DOB:</strong> {{ \Carbon\Carbon::parse($user->dob)->format('d M Y') }}</p> @endif @if($user->phone) <p><strong>Phone:</strong> {{ $user->phone }}</p> @endif @if($user->address) <p><strong>Address:</strong> {{ $user->address }}</p> @endif </div> <div> <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal"> Edit Profile </button> </div> </div> </div> <!-- Edit Profile Modal --> <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true"> <div class="modal-dialog"> <div class="modal-content"> <div class="modal-header"> <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5> <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> </div> <div class="modal-body"> <form action="{{ route('employee.updateProfile') }}" method="POST" enctype="multipart/form-data"> @csrf @method('PUT') <div class="mb-3"> <label>Name</label> <input type="text" name="name" class="form-control" value="{{ $user->name }}" required> </div> <div class="mb-3"> <label>Email</label> <input type="email" name="email" class="form-control" value="{{ $user->email }}" required> </div> <div class="mb-3"> <label>Profile Picture</label> <input type="file" name="profile_picture" class="form-control"> </div> <div class="text-end"> <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button> <button type="submit" class="btn btn-primary">Save Changes</button> </div> </form> </div> </div> </div> </div>
 
             <!-- Meeting Invitations -->
             <div class="card shadow-sm border-0 mb-4">
@@ -280,25 +211,27 @@
         </div>
     </div>
 
-    <!-- Cancel Booking Confirmation Modal -->
+    <!-- Cancel Booking Confirmation Modal (single modal for all rows) -->
     <div class="modal fade" id="cancelConfirmModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title">Confirm Cancellation</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    Are you sure you want to cancel this booking?
-                </div>
-                <div class="modal-footer">
-                    <form id="cancelBookingForm" method="POST">
+
+                <!-- form uses POST and Laravel spoofing for DELETE -->
+                <form id="cancelBookingForm" method="POST" action="">
+                    <div class="modal-body">
                         @csrf
-                        @method('PUT')
+                        @method('DELETE')
+                        <p>Are you sure you want to cancel this booking?</p>
+                    </div>
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
                         <button type="submit" class="btn btn-danger">Yes, Cancel</button>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -591,6 +524,26 @@
                 const form = document.getElementById('cancelBookingForm');
                 form.action = `/employee/bookings/${bookingId}/cancel`;
                 new bootstrap.Modal(document.getElementById('cancelConfirmModal')).show();
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // base URL for the cancel route (no trailing slash)
+            const cancelUrlBase = "{{ url('/cancel-booking') }}";
+            const cancelModalEl = document.getElementById('cancelConfirmModal');
+            const cancelForm = document.getElementById('cancelBookingForm');
+            const bsModal = new bootstrap.Modal(cancelModalEl);
+
+            document.querySelectorAll('.cancel-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const bookingId = this.getAttribute('data-id');
+                    // set the form action to /cancel-booking/{id}
+                    cancelForm.action = `${cancelUrlBase}/${bookingId}`;
+                    // show the modal
+                    bsModal.show();
+                });
             });
         });
     </script>
