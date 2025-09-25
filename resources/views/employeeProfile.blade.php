@@ -18,7 +18,152 @@
                 </div>
             </div>
 
-            <!-- Employee Info --> <div class="card shadow-sm border-0 mb-4"> <div class="card-body d-flex align-items-center"> <div class="me-4"> <img src="{{ $user->profile_picture ? asset('storage/' . $user->profile_picture) : asset('images/default-profile.png') }}" alt="Profile Picture" class="rounded-circle" width="120" height="120" style="object-fit: cover; border: 2px solid #007bff;"> </div> <div class="flex-grow-1"> <h4 class="mb-3 text-primary">My Information</h4> <p><strong>Name:</strong> {{ $user->name }}</p> <p><strong>Email:</strong> {{ $user->email }}</p> <p><strong>Role:</strong> {{ ucfirst($user->role) }}</p> @if($user->dob) <p><strong>DOB:</strong> {{ \Carbon\Carbon::parse($user->dob)->format('d M Y') }}</p> @endif @if($user->phone) <p><strong>Phone:</strong> {{ $user->phone }}</p> @endif @if($user->address) <p><strong>Address:</strong> {{ $user->address }}</p> @endif </div> <div> <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal"> Edit Profile </button> </div> </div> </div> <!-- Edit Profile Modal --> <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true"> <div class="modal-dialog"> <div class="modal-content"> <div class="modal-header"> <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5> <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> </div> <div class="modal-body"> <form action="{{ route('employee.updateProfile') }}" method="POST" enctype="multipart/form-data"> @csrf @method('PUT') <div class="mb-3"> <label>Name</label> <input type="text" name="name" class="form-control" value="{{ $user->name }}" required> </div> <div class="mb-3"> <label>Email</label> <input type="email" name="email" class="form-control" value="{{ $user->email }}" required> </div> <div class="mb-3"> <label>Profile Picture</label> <input type="file" name="profile_picture" class="form-control"> </div> <div class="text-end"> <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button> <button type="submit" class="btn btn-primary">Save Changes</button> </div> </form> </div> </div> </div> </div>
+            <!-- Employee Info -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body d-flex align-items-center">
+                    <div class="me-4">
+                        <img
+                            src="{{ $user->profile_picture ? asset('storage/' . $user->profile_picture) : asset('images/default-profile.png') }}"
+                            alt="Profile Picture"
+                            class="rounded-circle"
+                            width="120"
+                            height="120"
+                            style="object-fit: cover; border: 2px solid #007bff"
+                        />
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="mb-3 text-primary">My Information</h4>
+                        <p><strong>Name:</strong> {{ $user->name }}</p>
+                        <p><strong>Email:</strong> {{ $user->email }}</p>
+                        <p><strong>Role:</strong> {{ ucfirst($user->role) }}</p>
+                        @if($user->dob)
+                            <p>
+                                <strong>DOB:</strong> {{ \Carbon\Carbon::parse($user->dob)->format('d M
+        Y') }}
+                            </p>
+                        @endif @if($user->phone)
+                            <p><strong>Phone:</strong> {{ $user->phone }}</p>
+                        @endif @if($user->address)
+                            <p><strong>Address:</strong> {{ $user->address }}</p>
+                        @endif
+                    </div>
+                    <div>
+                        <button
+                            class="btn btn-sm btn-outline-primary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editProfileModal"
+                        >
+                            Edit Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Edit Profile Modal -->
+            <div
+                class="modal fade"
+                id="editProfileModal"
+                tabindex="-1"
+                aria-labelledby="editProfileModalLabel"
+                aria-hidden="true"
+            >
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                            <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            ></button>
+                        </div>
+                        <div class="modal-body">
+                            <form
+                                action="{{ route('employee.updateProfile') }}"
+                                method="POST"
+                                enctype="multipart/form-data"
+                            >
+                                @csrf
+                                @method('PUT')
+
+                                <!-- Name -->
+                                <div class="mb-3">
+                                    <label>Name</label>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        class="form-control"
+                                        value="{{ $user->name }}"
+                                        required
+                                    />
+                                </div>
+
+                                <!-- Email -->
+                                <div class="mb-3">
+                                    <label>Email</label>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        class="form-control"
+                                        value="{{ $user->email }}"
+                                        required
+                                    />
+                                </div>
+
+                                <!-- Phone -->
+                                <div class="mb-3">
+                                    <label>Phone Number</label>
+                                    <input
+                                        type="text"
+                                        name="phone"
+                                        class="form-control"
+                                        value="{{ $user->phone }}"
+                                    />
+                                </div>
+
+                                <!-- DOB -->
+                                <div class="mb-3">
+                                    <label>Date of Birth</label>
+                                    <input
+                                        type="date"
+                                        name="dob"
+                                        class="form-control"
+                                        value="{{ $user->dob }}"
+                                    />
+                                </div>
+
+                                <!-- Address -->
+                                <div class="mb-3">
+                                    <label>Address</label>
+                                    <textarea
+                                        name="address"
+                                        class="form-control"
+                                        rows="2"
+                                    >{{ $user->address }}</textarea>
+                                </div>
+
+                                <!-- Profile Picture -->
+                                <div class="mb-3">
+                                    <label>Profile Picture</label>
+                                    <input type="file" name="profile_picture" class="form-control" />
+                                </div>
+
+                                <!-- Buttons -->
+                                <div class="text-end">
+                                    <button
+                                        type="button"
+                                        class="btn btn-secondary"
+                                        data-bs-dismiss="modal"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Meeting Invitations -->
             <div class="card shadow-sm border-0 mb-4">
@@ -132,11 +277,17 @@
                                             {{ ucfirst($booking->status) }}
                                         </span>
                                     </td>
+                                    @if($booking->status == 'canceled')
+                                        <td>
+                                            <em class="text-muted">No actions available</em>
+                                        </td>
+                                    @else
                                     <td>
                                         <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#rescheduleModal{{ $booking->id }}">Reschedule</button>
                                         <button class="btn btn-sm btn-danger cancel-btn" data-id="{{ $booking->id }}">Cancel</button>
                                         <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#scheduleMeetingModal{{ $booking->id }}">Schedule Meeting</button>
                                     </td>
+                                    @endif
                                 </tr>
 
                                 <!-- Reschedule Modal -->
@@ -251,7 +402,6 @@
                         <th>Title</th>
                         <th>Agenda</th>
                         <th>Date</th>
-                        <th>Attendees</th>
                         <th>Actions</th>
                     </tr>
                     </thead>
@@ -263,15 +413,7 @@
                             <td>{{ $meeting->title }}</td>
                             <td>{{ $meeting->agenda ?? 'N/A' }}</td>
                             <td>{{ \Carbon\Carbon::parse($meeting->booking->booking_date ?? now())->format('d M Y') }}</td>
-                            <td>
-                                @if($meeting->attendees && $meeting->attendees->count() > 0)
-                                    @foreach($meeting->attendees as $attendee)
-                                        <span class="badge bg-info me-1">{{ $attendee->name }}</span>
-                                    @endforeach
-                                @else
-                                    <span class="text-muted">No attendees</span>
-                                @endif
-                            </td>
+
                             <td>
                                 <div class="d-flex gap-1">
                                     <form action="{{ route('meetings.delete', $meeting->id) }}" method="POST" class="d-inline">
